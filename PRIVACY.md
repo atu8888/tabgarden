@@ -1,50 +1,58 @@
-# Privacy Policy for Tab Garden
+Privacy Policy for Tab Garden
+Last Updated: September 13, 2025
 
-**Last Updated:** September 10, 2025
+Thank you for using Tab Garden! This privacy policy explains how our extension handles your data. Our guiding principle is to collect the minimum data necessary to provide our features and to be fully transparent about how we use it.
 
-Thank you for using Tab Garden! This privacy policy explains how our extension handles your data. Our guiding principle is to collect the minimum data necessary to provide the core features of the extension, and to be fully transparent about it.
+1. Data Stored Locally on Your Device
+   For core, offline functionality, some data is stored only on your computer using the chrome.storage API. This data is never sent to our servers unless you create an account to use social features (specifically, your productivity score).
 
-### Data We Collect and Why
+Your List of Productive/Unproductive Websites: The lists of websites you categorize are stored locally. This is essential for the extension to determine if your current activity should contribute to your garden's growth.
 
-Tab Garden is designed to be a private and secure experience. All the data we "collect" is stored locally on your computer using the `chrome.storage` API. **This data is never sent to our servers or any third party.**
+Your Garden's State: Information about your plants, items, and their current status is stored locally to save your progress.
 
-Here is a list of the data stored locally on your device:
+Detailed Browsing Activity: To calculate your productivity, the extension tracks time spent on websites. This detailed log of your browsing activity remains on your device and is not sent to our servers.
 
-1.  **Your List of Productive/Unproductive Websites:**
-    * **What it is:** The list of website URLs (e.g., "youtube.com") that you categorize as either productive or unproductive.
-    * **Why we need it:** This is essential for the core functionality of the extension, which is to determine if your current activity should contribute to your garden's growth.
+2. User Accounts and Social Features
+   To use social features like adding friends, sending gifts, and sharing your progress, you must create a Tab Garden account. Creating an account is optional. If you choose to create one, we collect and store the following information on Google's secure Firebase servers:
 
-2.  **Session and Productivity Scores:**
-    * **What it is:** Data about your focus sessions, such as the duration (e.g., 45 minutes) and the resulting productivity score.
-    * **Why we need it:** To show you your progress and allow you to track your focus habits over time.
+Account Information:
 
-3.  **Your Garden's State:**
-    * **What it is:** Information about the plants in your garden and their current growth status.
-    * **Why we need it:** To save your beautiful garden so it's there when you return!
+What we store: Your email address, a chosen display name, and a unique user ID provided by Firebase Authentication.
 
-### Data We Temporarily Process
+Why we need it: To uniquely identify you, allow you to log in, manage your account (e.g., password resets), and enable you to connect with friends.
 
-To function, the extension needs to check your active tab.
+Social and Gameplay Data:
 
-* **Active Tab URL:** While a focus session is active, the extension checks the URL of your current tab to see if it matches a site on your productive list. This check happens entirely within your browser. **This browsing information is used only in real-time and is not stored or logged.** It is discarded the moment you switch tabs or end the session.
+What we store: Your overall productivity score, your friends list, and data related to social interactions like friend requests, invitations, and gifts.
 
-### Data We DO NOT Collect
+Why we need it: This is the core of the social experience. It allows your friends to see your score and enables you to send and receive items and requests.
 
-We believe your browsing data is your own. Tab Garden **DOES NOT** collect, store, or transmit:
-* Your overall browsing history.
-* Any personal information (like your name, email address, or IP address).
-* Data from your passwords or any content you type into websites.
+3. How Your Data is Shared
+   Your privacy within the social features is important. Here is what other users can and cannot see:
 
-### Open Source
+What Friends Can See: Users on your friends list can see your display name and your productivity score.
 
-Tab Garden is fully open-source. We encourage you to review the code on our GitHub repository to verify that we stand by our privacy promises.
+What Friends Cannot See: Your friends cannot see your email address, your lists of productive/unproductive websites, or your detailed browsing habits.
 
-### Changes to This Policy
+Finding Friends: Other users can send you a friend request by searching for your account email address. Your email is not publicly displayed.
 
-We may update this privacy policy from time to time. Any changes will be reflected in this document.
+4. Data We DO NOT Collect
+   We are committed to protecting your privacy. Tab Garden DOES NOT collect, store, or transmit:
 
-### Contact Us
+Your overall browsing history from your device to our servers.
 
-If you have any questions about this privacy policy, please contact us! 
+Data from your passwords or any content you type into websites.
+
+5. Data Deletion
+   You have the right to delete your account and all associated server data at any time. To request account deletion, please contact us at the email address below. Local data stored by the extension can be cleared by removing the extension from your browser.
+
+6. Open Source
+   Tab Garden is fully open-source. We encourage you to review the code on our GitHub repository to verify that we stand by our privacy promises.
+
+7. Changes to This Policy
+   We may update this privacy policy from time to time. We will notify you of any significant changes, and the latest version will always be available here.
+
+8. Contact Us
+   If you have any questions about this privacy policy, please contact us!
 
 Email: atuextensions@gmail.com

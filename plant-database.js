@@ -1,7 +1,7 @@
 const PLANT_DATABASE = {
   rose: {
     id: "rose",
-    name: "Mystic Rose",
+    name: "Radiant Rose",
     description:
       "A bloom born from twilight's deep embrace, its velvet petals hold the soft glow of starlight. ",
     cost: 100,

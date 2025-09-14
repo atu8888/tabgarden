@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Ignore Firebase configuration
+firebase-config.js
+
+# Project asset and library folders
+icons/
+images/
+lib/

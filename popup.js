@@ -1,3 +1,201 @@
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const POTION_SVG_ICON = `<svg class="potion-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path style="fill:#B4D8F1;" d="M298.667,176.044V0h-85.333v176.044c-73.61,18.945-128,85.766-128,165.289 C85.333,435.59,161.744,512,256,512s170.667-76.41,170.667-170.667C426.667,261.81,372.277,194.99,298.667,176.044z"/><path style="fill:#98C8ED;" d="M298.667,176.044V0H256v512c94.256,0,170.667-76.41,170.667-170.667 C426.667,261.81,372.277,194.99,298.667,176.044z"/><path style="fill:#E592BF;" d="M85.333,341.333C85.333,435.59,161.744,512,256,512s170.667-76.41,170.667-170.667H85.333z"/><rect x="213.333" style="fill:#A58868;" width="85.333" height="85.333"/><rect x="256" style="fill:#947859;" width="42.667" height="85.333"/><path style="fill:#E176AF;" d="M256,341.333V512c94.256,0,170.667-76.41,170.667-170.667H256z"/></g></svg>`;
+
+async function displaySocialData(userId) {
+  const userRef = db.collection("users").doc(userId);
+  const userDoc = await userRef.get();
+
+  if (!userDoc.exists) {
+    console.error("User document not found!");
+    return;
+  }
+  const userData = userDoc.data();
+
+  const friendsList = document.getElementById("friends-list");
+  const mailboxList = document.getElementById("mailbox-list-container");
+  const giftFriendsList = document.getElementById("gift-friends-list");
+
+  friendsList.innerHTML = "";
+  mailboxList.innerHTML = "";
+  giftFriendsList.innerHTML = "";
+
+  if (
+    userData.incomingFriendRequests &&
+    userData.incomingFriendRequests.length > 0
+  ) {
+    for (const requesterId of userData.incomingFriendRequests) {
+      const requesterDoc = await db.collection("users").doc(requesterId).get();
+      const requesterData = requesterDoc.data();
+
+      const mailboxListItem = document.createElement("div");
+      mailboxListItem.className = "mailbox-item";
+      mailboxListItem.innerHTML = `
+        <div class="request-text-container">
+          <span class="request-text">Friend Request:</span>
+          <span class="request-text">${requesterData.displayName}</span>
+        </div>
+        <div class="request-actions">
+          <button class="action-btn productive" title="Accept Request" data-id="${requesterId}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></svg>
+          </button>
+          <button class="action-btn unproductive" title="Decline Request" data-id="${requesterId}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+          </button>
+        </div>
+      `;
+      mailboxList.appendChild(mailboxListItem);
+    }
+  } else {
+    mailboxList.innerHTML =
+      "<span class='empty-mailbox-message'>Your mailbox is empty.</span>";
+  }
+
+  const giftsRef = db.collection("gifts");
+  const giftsQuery = giftsRef
+    .where("toId", "==", userId)
+    .where("status", "==", "unclaimed");
+  const giftsSnapshot = await giftsQuery.get();
+
+  if (!giftsSnapshot.empty) {
+    if (mailboxList.querySelector(".empty-mailbox-message")) {
+      mailboxList.innerHTML = "";
+    }
+
+    giftsSnapshot.forEach((giftDoc) => {
+      const giftData = giftDoc.data();
+      const giftItem = document.createElement("div");
+      giftItem.className = "mailbox-item";
+
+      if (giftData.giftType === "gold") {
+        giftItem.innerHTML = `
+          <div class="gift-text-container">
+            <span class="gift-subtitle">Thanks for sharing</span>
+            <span class="gift-subtitle">Tab Garden!</span>
+          </div>
+          <button class="claim-gift-btn gift-reward-button" data-gift-id="${giftDoc.id}" data-gift-type="gold" data-amount="${giftData.amount}">
+            <span>100</span>
+            <svg class="gold-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M256,512C114.842,512,0,397.158,0,256S114.842,0,256,0s256,114.842,256,256S397.158,512,256,512z" style="fill:#FFDA44;"/><path d="M256,0L256,0v5.565V512l0,0c141.158,0,256-114.842,256-256S397.158,0,256,0z" style="fill:#FFA733;"/><path d="M256,439.652c-101.266,0-183.652-82.391-183.652-183.652S154.733,72.348,256,72.348   S439.652,154.739,439.652,256S357.266,439.652,256,439.652z" style="fill:#EE8700;"/><path d="M439.652,256c0-101.261-82.386-183.652-183.652-183.652v367.304 C357.266,439.652,439.652,357.261,439.652,256z" style="fill:#CC7400;"/><path d="M263.805,241.239c-17.517-9.261-35.631-18.826-35.631-29.761c0-15.348,12.484-27.826,27.826-27.826   s27.826,12.478,27.826,27.826c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696c0-27.956-18.867-51.548-44.522-58.842   v-7.94c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696v7.94c-25.655,7.294-44.522,30.886-44.522,58.842   c0,31.044,29.619,46.707,53.413,59.283c17.517,9.261,35.631,18.826,35.631,29.761c0,15.348-12.484,27.826-27.826,27.826   s-27.826-12.478-27.826-27.826c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696   c0,27.956,18.867,51.548,44.522,58.842v7.94c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696,16.696v-7.94   c25.655-7.294,44.522-30.886,44.522-58.842C317.217,269.478,287.598,253.815,263.805,241.239z" style="fill:#FFDA44;"/><g><path d="M272.696,367.304v-7.94c25.655-7.294,44.522-30.886,44.522-58.842    c0-31.044-29.619-46.707-53.413-59.283c-2.616-1.384-5.226-2.777-7.805-4.176v37.875c14.699,7.976,27.826,16.283,27.826,25.584    c0,15.348-12.484,27.826-27.826,27.826V384C265.223,384,272.696,376.521,272.696,367.304z" style="fill:#FFA733;"/><path d="M283.826,211.478c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696    c0-27.956-18.867-51.548-44.522-58.842v-7.94c0-9.217-7.473-16.696-16.696-16.696v55.652    C271.342,183.652,283.826,196.13,283.826,211.478z" style="fill:#FFA733;"/></g></g></svg>
+          </button>
+        `;
+      } else {
+        const plantData = PLANT_DATABASE[giftData.plantType];
+        giftItem.innerHTML = `
+          <div class="gift-text-container">
+            <span class="plant-gift-text">${giftData.fromName} gifted you a ${plantData.name}!</span>
+          </div>
+          <button class="claim-gift-btn plant-claim-button" data-gift-id="${giftDoc.id}" data-plant-type="${giftData.plantType}">Claim!</button>
+        `;
+      }
+      mailboxList.appendChild(giftItem);
+    });
+  }
+
+  const invalidFriendIds = [];
+
+  const currentUserItem = document.createElement("li");
+  currentUserItem.className = "friend-item current-user-item";
+  currentUserItem.innerHTML = `
+    <span class="friend-name">${userData.displayName} (You)</span>
+    <div class="friend-actions">
+      <span class="friend-score">Productivity: ${userData.productivityScore}%</span>
+      <div class="remove-btn-container"></div>
+    </div>
+  `;
+  friendsList.appendChild(currentUserItem);
+
+  if (userData.friends && userData.friends.length > 0) {
+    for (const friendId of userData.friends) {
+      const friendDoc = await db.collection("users").doc(friendId).get();
+
+      if (friendDoc.exists) {
+        const friendData = friendDoc.data();
+        const listItem = document.createElement("li");
+        listItem.className = "friend-item";
+        listItem.innerHTML = `
+          <span class="friend-name">${friendData.displayName}</span>
+          <div class="friend-actions">
+            <span class="friend-score">Productivity: ${friendData.productivityScore}%</span>
+            <div class="remove-btn-container">
+                <button class="remove-friend-btn" data-id="${friendId}" title="Remove Friend">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+            </div>
+          </div>
+        `;
+        friendsList.appendChild(listItem);
+
+        const giftFriendButton = document.createElement("button");
+        giftFriendButton.className = "select-friend-btn";
+        giftFriendButton.textContent = friendData.displayName;
+        giftFriendButton.dataset.id = friendId;
+        giftFriendsList.appendChild(giftFriendButton);
+      } else {
+        console.warn(`Friend ID ${friendId} not found. Queuing for removal.`);
+        invalidFriendIds.push(friendId);
+      }
+    }
+
+    if (invalidFriendIds.length > 0) {
+      await userRef.update({
+        friends: firebase.firestore.FieldValue.arrayRemove(...invalidFriendIds),
+      });
+      console.log("Cleaned up invalid friend IDs from the user's friend list.");
+    }
+  }
+
+  if (
+    friendsList.children.length <= 1 &&
+    (!userData.friends || userData.friends.length === 0)
+  ) {
+    friendsList.innerHTML =
+      "<li class='empty-message-li'>You have no friends yet. Add one below!</li>";
+  }
+
+  if (giftFriendsList.children.length === 0) {
+    giftFriendsList.innerHTML =
+      "<span class='empty-message'>Add friends to send gifts.</span>";
+  }
+}
+
+function updateGiftDropdown() {
+  chrome.storage.local.get(["plantInventory"], (data) => {
+    const { plantInventory = {} } = data;
+    const giftablePlantsList = document.getElementById("giftable-plants-list");
+    giftablePlantsList.innerHTML = "";
+
+    const giftablePlants = Object.values(plantInventory).filter(
+      (p) => p.currentGrowth === 100
+    );
+
+    if (giftablePlants.length === 0) {
+      giftablePlantsList.innerHTML =
+        "<span class='empty-gift-message'>No plants are ready to gift.</span>";
+      return;
+    }
+
+    giftablePlants.forEach((plant) => {
+      const plantData = PLANT_DATABASE[plant.type];
+      const button = document.createElement("button");
+      button.className = "gift-item-btn";
+      button.textContent = `🌸 ${plantData.name}`;
+
+      button.addEventListener("click", () => {
+        window.plantToGift = plant;
+        console.log(`1. CLICKED PLANT: plantToGift is now set to`, plantToGift);
+        document
+          .getElementById("gift-plant-selection")
+          .classList.remove("active");
+        document
+          .getElementById("gift-recipient-selection")
+          .classList.add("active");
+      });
+      giftablePlantsList.appendChild(button);
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const navItems = document.querySelectorAll("nav .radio");
   const pages = document.querySelectorAll(".page");
@@ -15,6 +213,513 @@ document.addEventListener("DOMContentLoaded", () => {
   const sellPlantBtn = document.getElementById("sell-plant-btn");
   const MAX_GARDEN_SIZE = 8;
   let isPurchasing = false;
+  let plantToGift = null;
+
+  const signupForm = document.getElementById("signup-form");
+  const loginForm = document.getElementById("login-form");
+  const resendBtn = document.getElementById("resend-verification-btn");
+  const forgotPasswordLink = document.getElementById("forgot-password-link");
+
+  if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const emailInput = document.querySelector(
+        "#login-form input[name='email']"
+      );
+      const email = emailInput.value.trim();
+
+      if (!email) {
+        alert(
+          "Please enter your email address above, then click 'Forgot Password?' again."
+        );
+        return;
+      }
+
+      auth
+        .sendPasswordResetEmail(email)
+        .then(() => {
+          alert(
+            "Password reset email sent! Please check your inbox (and spam folder)."
+          );
+        })
+        .catch((error) => {
+          console.error("Password Reset Error:", error);
+          alert(error.message);
+        });
+    });
+  }
+
+  if (resendBtn) {
+    resendBtn.addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (user) {
+        user
+          .sendEmailVerification()
+          .then(() => {
+            alert(
+              "Another verification email has been sent. Please check your spam inbox."
+            );
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      }
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = signupForm.email.value;
+      const password = signupForm.password.value;
+      const name = signupForm.name.value;
+
+      if (!name.trim()) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then(async (cred) => {
+          const user = cred.user;
+          await user.getIdToken(true);
+          await db.collection("users").doc(user.uid).set({
+            displayName: name,
+            email: user.email.toLowerCase(),
+            productivityScore: 0,
+            friends: [],
+            incomingFriendRequests: [],
+            outgoingFriendRequests: [],
+          });
+
+          try {
+            await processSignUpReward(user.email.toLowerCase(), user.uid);
+          } catch (e) {
+            console.warn("Invite reward skipped:", e);
+          }
+
+          chrome.runtime.sendMessage({ action: "userLoggedIn", user });
+          user.sendEmailVerification();
+          alert("Account created! Verification email sent.");
+        })
+        .then(() => {
+          console.log("User profile created in Firestore!");
+        })
+        .catch((error) => {
+          alert(error.message);
+          console.error("Signup Error:", error);
+        });
+    });
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = loginForm.email.value;
+      const password = loginForm.password.value;
+
+      auth
+        .signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("User logged in:", user.email);
+          chrome.runtime.sendMessage({ action: "userLoggedIn", user: user });
+        })
+        .catch((error) => {
+          alert(error.message);
+          console.error("Login Error:", error);
+        });
+    });
+  }
+
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      auth
+        .signOut()
+        .then(() => {
+          console.log("User signed out.");
+          chrome.runtime.sendMessage({ action: "userLoggedOut" });
+        })
+        .catch((error) => {
+          console.error("Sign out error", error);
+        });
+    });
+  }
+
+  const addFriendBtn = document.getElementById("add-friend-btn");
+
+  if (addFriendBtn) {
+    addFriendBtn.addEventListener("click", async () => {
+      const emailToSearch = document
+        .getElementById("add-friend-email")
+        .value.trim();
+      const currentUser = auth.currentUser;
+
+      if (!emailToSearch || !currentUser) {
+        alert("Please enter an email.");
+        return;
+      }
+      if (emailToSearch === currentUser.email) {
+        alert("You can't add yourself as a friend.");
+        return;
+      }
+
+      const usersRef = db.collection("users");
+      const query = usersRef.where("email", "==", emailToSearch).limit(1);
+      const snapshot = await query.get();
+
+      if (snapshot.empty) {
+        alert("User not found.");
+        return;
+      }
+
+      const targetUserId = snapshot.docs[0].id;
+      const currentUserRef = db.collection("users").doc(currentUser.uid);
+      const targetUserRef = db.collection("users").doc(targetUserId);
+
+      const batch = db.batch();
+
+      batch.update(currentUserRef, {
+        outgoingFriendRequests:
+          firebase.firestore.FieldValue.arrayUnion(targetUserId),
+      });
+      batch.update(targetUserRef, {
+        incomingFriendRequests: firebase.firestore.FieldValue.arrayUnion(
+          currentUser.uid
+        ),
+      });
+
+      await batch.commit();
+      alert("Friend request sent!");
+      document.getElementById("add-friend-email").value = "";
+    });
+  }
+
+  const mailboxListContainer = document.getElementById(
+    "mailbox-list-container"
+  );
+
+  if (mailboxListContainer) {
+    mailboxListContainer.addEventListener("click", async (e) => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const actionButton = e.target.closest(".action-btn");
+
+      if (actionButton && actionButton.dataset.id) {
+        const requesterId = actionButton.dataset.id;
+        const currentUserRef = db.collection("users").doc(currentUser.uid);
+        const requesterRef = db.collection("users").doc(requesterId);
+        const batch = db.batch();
+
+        if (actionButton.classList.contains("productive")) {
+          batch.update(currentUserRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(requesterId),
+            incomingFriendRequests:
+              firebase.firestore.FieldValue.arrayRemove(requesterId),
+          });
+          batch.update(requesterRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+            outgoingFriendRequests: firebase.firestore.FieldValue.arrayRemove(
+              currentUser.uid
+            ),
+          });
+        } else if (actionButton.classList.contains("unproductive")) {
+          batch.update(currentUserRef, {
+            incomingFriendRequests:
+              firebase.firestore.FieldValue.arrayRemove(requesterId),
+          });
+          batch.update(requesterRef, {
+            outgoingFriendRequests: firebase.firestore.FieldValue.arrayRemove(
+              currentUser.uid
+            ),
+          });
+        }
+
+        await batch.commit();
+        displaySocialData(currentUser.uid);
+      } else if (e.target.classList.contains("claim-gift-btn")) {
+        const giftId = e.target.dataset.giftId;
+        const giftRef = db.collection("gifts").doc(giftId);
+
+        if (e.target.dataset.giftType === "gold") {
+          const amount = parseInt(e.target.dataset.amount, 10);
+
+          const data = await chrome.storage.local.get("playerGold");
+          const newGoldValue = (data.playerGold || 0) + amount;
+
+          await chrome.storage.local.set({ playerGold: newGoldValue });
+
+          await giftRef.update({ status: "claimed" });
+
+          alert(`You claimed ${amount} gold!`);
+        } else {
+          const plantType = e.target.dataset.plantType;
+          if (!plantType) return;
+
+          const { plantInventory = {} } = await chrome.storage.local.get(
+            "plantInventory"
+          );
+          const instanceId = `${plantType}_${Date.now()}`;
+          plantInventory[instanceId] = {
+            instanceId: instanceId,
+            type: plantType,
+            dayPlanted: new Date().toISOString().slice(0, 10),
+            currentHealth: 100,
+            currentGrowth: 100,
+          };
+
+          await chrome.storage.local.set({ plantInventory });
+          await giftRef.update({ status: "claimed" });
+
+          alert(`You received a ${PLANT_DATABASE[plantType].name}!`);
+        }
+        displaySocialData(currentUser.uid);
+      }
+    });
+  }
+
+  const friendsList = document.getElementById("friends-list");
+
+  if (friendsList) {
+    friendsList.addEventListener("click", async (e) => {
+      const removeBtn = e.target.closest(".remove-friend-btn");
+
+      if (removeBtn) {
+        const currentUser = auth.currentUser;
+        const friendIdToRemove = removeBtn.dataset.id;
+
+        if (!currentUser || !friendIdToRemove) return;
+
+        if (confirm("Are you sure you want to remove this friend?")) {
+          const currentUserRef = db.collection("users").doc(currentUser.uid);
+          const friendRef = db.collection("users").doc(friendIdToRemove);
+          const batch = db.batch();
+
+          batch.update(currentUserRef, {
+            friends:
+              firebase.firestore.FieldValue.arrayRemove(friendIdToRemove),
+          });
+
+          batch.update(friendRef, {
+            friends: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
+          });
+
+          await batch.commit();
+          displaySocialData(currentUser.uid);
+        }
+      }
+    });
+  }
+
+  const socialMoreBtn = document.getElementById("action-social-more");
+
+  if (socialMoreBtn) {
+    socialMoreBtn.addEventListener("click", () => {
+      const friendsList = document.getElementById("friends-list");
+      friendsList.classList.toggle("show-remove");
+    });
+  }
+
+  const giftBtn = document.getElementById("action-gift");
+  const inviteBtn = document.getElementById("action-invite");
+  const mailboxBtn = document.getElementById("action-mailbox");
+
+  const setupDropdownHover = (button) => {
+    if (!button) return;
+    const dropdown = button.querySelector(".dropdown-content");
+    if (dropdown) {
+      button.addEventListener("mouseenter", () =>
+        dropdown.classList.add("open")
+      );
+      button.addEventListener("mouseleave", () =>
+        dropdown.classList.remove("open")
+      );
+    }
+  };
+
+  if (giftBtn) {
+    const giftDropdown = document.getElementById("gift-dropdown");
+    const plantSelectionView = document.getElementById("gift-plant-selection");
+    const recipientSelectionView = document.getElementById(
+      "gift-recipient-selection"
+    );
+    const giftFriendsList = document.getElementById("gift-friends-list");
+
+    giftBtn.addEventListener("mouseenter", () => {
+      plantToGift = null;
+      plantSelectionView.classList.add("active");
+      recipientSelectionView.classList.remove("active");
+      updateGiftDropdown();
+      giftDropdown.classList.add("open");
+    });
+
+    giftBtn.addEventListener("mouseleave", () => {
+      giftDropdown.classList.remove("open");
+    });
+
+    giftFriendsList.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("select-friend-btn")) {
+        const currentUser = auth.currentUser;
+        const recipientId = e.target.dataset.id;
+
+        if (!window.plantToGift || !currentUser || !recipientId) {
+          console.error(
+            "Missing data for gifting. plantToGift:",
+            window.plantToGift
+          );
+          return;
+        }
+
+        const currentUserDoc = await db
+          .collection("users")
+          .doc(currentUser.uid)
+          .get();
+        if (!currentUserDoc.exists) {
+          console.error("Could not find the sender's user profile.");
+          return;
+        }
+        const senderName = currentUserDoc.data().displayName;
+
+        await db.collection("gifts").add({
+          fromId: currentUser.uid,
+          fromName: senderName,
+          toId: recipientId,
+          plantType: window.plantToGift.type,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          status: "unclaimed",
+        });
+
+        const { plantInventory } = await chrome.storage.local.get(
+          "plantInventory"
+        );
+        delete plantInventory[window.plantToGift.instanceId];
+        await chrome.storage.local.set({ plantInventory });
+
+        alert(
+          `You've sent a ${
+            PLANT_DATABASE[window.plantToGift.type].name
+          } to your friend!`
+        );
+
+        giftDropdown.classList.remove("open");
+      }
+    });
+  }
+
+  async function sendInvitation(inviterId, invitedEmail) {
+    const usersRef = db.collection("users");
+    const userQuery = usersRef.where("email", "==", invitedEmail).limit(1);
+    const userSnapshot = await userQuery.get();
+
+    if (!userSnapshot.empty) {
+      alert("This person already has a Tab Garden account!");
+      return false;
+    }
+
+    const invitesRef = db.collection("invites");
+    const inviteQuery = invitesRef.where("email", "==", invitedEmail).limit(1);
+    const inviteSnapshot = await inviteQuery.get();
+
+    if (!inviteSnapshot.empty) {
+      alert("An invitation has already been sent to this email address.");
+      return false;
+    }
+
+    await invitesRef.add({
+      from: inviterId,
+      email: invitedEmail,
+      status: "pending",
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return true;
+  }
+
+  async function processSignUpReward(newUserEmail, newUserId) {
+    const invitesRef = db.collection("invites");
+    const inviteQuery = invitesRef
+      .where("email", "==", newUserEmail)
+      .where("status", "==", "pending")
+      .limit(1);
+
+    const querySnapshot = await inviteQuery.get();
+
+    if (!querySnapshot.empty) {
+      const inviteDoc = querySnapshot.docs[0];
+      const inviterId = inviteDoc.data().from;
+
+      await db.collection("gifts").add({
+        toId: inviterId,
+        fromName: "Tab Garden Rewards",
+        giftType: "gold",
+        amount: 100,
+        status: "unclaimed",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await inviteDoc.ref.update({
+        status: "completed",
+        completedBy: newUserId,
+      });
+
+      console.log(`A 100 gold reward gift has been sent to user ${inviterId}.`);
+    }
+  }
+
+  if (inviteBtn) {
+    const sendInviteBtn = document.getElementById("send-invite-btn");
+    const initialView = document.getElementById("invite-initial-view");
+    const shareView = document.getElementById("invite-share-view");
+    const emailInput = document.getElementById("invite-email-input");
+
+    sendInviteBtn.addEventListener("click", async () => {
+      const emailToInvite = emailInput.value.trim();
+      const currentUser = auth.currentUser;
+
+      if (!emailToInvite || !currentUser) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
+      const success = await sendInvitation(currentUser.uid, emailToInvite);
+
+      if (success) {
+        emailInput.value = "";
+        initialView.classList.remove("active");
+        shareView.classList.add("active");
+      }
+    });
+  }
+
+  setupDropdownHover(inviteBtn);
+  setupDropdownHover(mailboxBtn);
+
+  auth.onAuthStateChanged((user) => {
+    const loggedInView = document.getElementById("social-page-logged-in");
+    const loggedOutView = document.getElementById("social-page-logged-out");
+    const verifyEmailBanner = document.getElementById("verify-email-banner");
+
+    if (user) {
+      loggedInView.style.display = "block";
+      loggedOutView.style.display = "none";
+
+      if (user.emailVerified) {
+        verifyEmailBanner.style.display = "none";
+        displaySocialData(user.uid);
+      } else {
+        verifyEmailBanner.style.display = "block";
+        displaySocialData(user.uid);
+      }
+    } else {
+      loggedInView.style.display = "none";
+      loggedOutView.style.display = "block";
+      verifyEmailBanner.style.display = "none";
+    }
+  });
 
   function timeAgo(isoString) {
     const date = new Date(isoString);
@@ -221,7 +926,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const button = document.createElement("button");
         button.className = "sell-item-btn";
 
-        button.textContent = `🌸 ${plantData.name} for ${plantData.sellValue}💰`;
+        button.innerHTML = `🌸 ${plantData.name} for ${plantData.sellValue} <svg class="gold-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M256,512C114.842,512,0,397.158,0,256S114.842,0,256,0s256,114.842,256,256S397.158,512,256,512z" style="fill:#FFDA44;"/><path d="M256,0L256,0v5.565V512l0,0c141.158,0,256-114.842,256-256S397.158,0,256,0z" style="fill:#FFA733;"/><path d="M256,439.652c-101.266,0-183.652-82.391-183.652-183.652S154.733,72.348,256,72.348   S439.652,154.739,439.652,256S357.266,439.652,256,439.652z" style="fill:#EE8700;"/><path d="M439.652,256c0-101.261-82.386-183.652-183.652-183.652v367.304 C357.266,439.652,439.652,357.261,439.652,256z" style="fill:#CC7400;"/><path d="M263.805,241.239c-17.517-9.261-35.631-18.826-35.631-29.761c0-15.348,12.484-27.826,27.826-27.826   s27.826,12.478,27.826,27.826c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696c0-27.956-18.867-51.548-44.522-58.842   v-7.94c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696v7.94c-25.655,7.294-44.522,30.886-44.522,58.842   c0,31.044,29.619,46.707,53.413,59.283c17.517,9.261,35.631,18.826,35.631,29.761c0,15.348-12.484,27.826-27.826,27.826   s-27.826-12.478-27.826-27.826c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696   c0,27.956,18.867,51.548,44.522,58.842v7.94c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696v-7.94   c25.655-7.294,44.522-30.886,44.522-58.842C317.217,269.478,287.598,253.815,263.805,241.239z" style="fill:#FFDA44;"/><g><path d="M272.696,367.304v-7.94c25.655-7.294,44.522-30.886,44.522-58.842    c0-31.044-29.619-46.707-53.413-59.283c-2.616-1.384-5.226-2.777-7.805-4.176v37.875c14.699,7.976,27.826,16.283,27.826,25.584    c0,15.348-12.484,27.826-27.826,27.826V384C265.223,384,272.696,376.521,272.696,367.304z" style="fill:#FFA733;"/><path d="M283.826,211.478c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696    c0-27.956-18.867-51.548-44.522-58.842v-7.94c0-9.217-7.473-16.696-16.696-16.696v55.652    C271.342,183.652,283.826,196.13,283.826,211.478z" style="fill:#FFA733;"/></g></g></svg>`;
 
         button.addEventListener("click", () => sellPlant(plant.instanceId));
         buttonListContainer.appendChild(button);
@@ -299,7 +1004,7 @@ document.addEventListener("DOMContentLoaded", () => {
         seedInventory.forEach((seedType) => {
           const seedData = PLANT_DATABASE[seedType];
           const button = document.createElement("button");
-          button.textContent = `🌱 ${seedData.name} (Seed)`;
+          button.innerHTML = `🌱 ${seedData.name} (Seed)`;
           button.dataset.seedType = seedType;
           button.disabled = isPlantActive;
           if (isPlantActive) {
@@ -444,7 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(" ");
 
-        button.textContent = `❤️ ${displayName} (x${count})`;
+        button.innerHTML = `${POTION_SVG_ICON} ${displayName} (x${count})`;
         button.dataset.potionType = type;
         button.disabled = !isPlantActive;
         if (!isPlantActive) {
@@ -861,7 +1566,9 @@ document.addEventListener("DOMContentLoaded", () => {
       card.innerHTML = `
         <div class="shop-item-name">${item.name}</div>
         <div class="shop-item-icon">${item.icon}</div>
-        <div class="shop-item-price">${item.cost} 💰</div>
+        <div class="shop-item-price">${
+          item.cost
+        } <svg class="gold-icon" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M256,512C114.842,512,0,397.158,0,256S114.842,0,256,0s256,114.842,256,256S397.158,512,256,512z" style="fill:#FFDA44;"/><path d="M256,0L256,0v5.565V512l0,0c141.158,0,256-114.842,256-256S397.158,0,256,0z" style="fill:#FFA733;"/><path d="M256,439.652c-101.266,0-183.652-82.391-183.652-183.652S154.733,72.348,256,72.348   S439.652,154.739,439.652,256S357.266,439.652,256,439.652z" style="fill:#EE8700;"/><path d="M439.652,256c0-101.261-82.386-183.652-183.652-183.652v367.304 C357.266,439.652,439.652,357.261,439.652,256z" style="fill:#CC7400;"/><path d="M263.805,241.239c-17.517-9.261-35.631-18.826-35.631-29.761c0-15.348,12.484-27.826,27.826-27.826   s27.826,12.478,27.826,27.826c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696c0-27.956-18.867-51.548-44.522-58.842   v-7.94c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696v7.94c-25.655,7.294-44.522,30.886-44.522,58.842   c0,31.044,29.619,46.707,53.413,59.283c17.517,9.261,35.631,18.826,35.631,29.761c0,15.348-12.484,27.826-27.826,27.826   s-27.826-12.478-27.826-27.826c0-9.217-7.473-16.696-16.696-16.696s-16.696,7.479-16.696,16.696   c0,27.956,18.867,51.548,44.522,58.842v7.94c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696v-7.94   c25.655-7.294,44.522-30.886,44.522-58.842C317.217,269.478,287.598,253.815,263.805,241.239z" style="fill:#FFDA44;"/><g><path d="M272.696,367.304v-7.94c25.655-7.294,44.522-30.886,44.522-58.842    c0-31.044-29.619-46.707-53.413-59.283c-2.616-1.384-5.226-2.777-7.805-4.176v37.875c14.699,7.976,27.826,16.283,27.826,25.584    c0,15.348-12.484,27.826-27.826,27.826V384C265.223,384,272.696,376.521,272.696,367.304z" style="fill:#FFA733;"/><path d="M283.826,211.478c0,9.217,7.473,16.696,16.696,16.696s16.696-7.479,16.696-16.696    c0-27.956-18.867-51.548-44.522-58.842v-7.94c0-9.217-7.473-16.696-16.696-16.696v55.652    C271.342,183.652,283.826,196.13,283.826,211.478z" style="fill:#FFA733;"/></g></g></svg></div>
         <button data-id="${
           item.id
         }" data-type="${type}" data-index="${index}" ${
@@ -1188,7 +1895,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayStr = `${year}-${month}-${day}`;
 
     const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0-11
+    const currentMonth = today.getMonth();
 
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());

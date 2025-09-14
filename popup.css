@@ -37,6 +37,17 @@ main {
   padding: 10px;
 }
 
+.secondary-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #eae8e8;
+  font-family: "Figtree", sans-serif;
+  font-weight: 300;
+}
+
 /* -- Navigation Bar -- */
 
 .radio-inputs {
@@ -1020,6 +1031,9 @@ nav .radio[data-page="shop-page"] {
   font-size: 12px;
   font-weight: 600;
   color: #666;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .shop-item button {
@@ -1043,7 +1057,816 @@ nav .radio[data-page="shop-page"] {
 }
 
 #back-to-garden-btn {
-  margin-top: auto;
+  margin-top: 8px;
   width: 150px;
   align-self: center;
+}
+
+/* Social Page */
+#social-page.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 0%;
+}
+#social-page-logged-out {
+  padding-top: 60px;
+}
+
+.wrapper {
+  --input-focus: #2d8cf0;
+  --font-color: #323232;
+  --font-color-sub: #666;
+  --bg-color: #fff;
+  --bg-color-alt: #666;
+  --main-color: #323232;
+}
+
+.switch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 50px;
+  height: 20px;
+}
+
+.card-side::before {
+  position: absolute;
+  content: "Log in";
+  left: -70px;
+  top: 0;
+  width: 100px;
+  text-decoration: underline;
+  color: var(--font-color);
+  font-weight: 600;
+}
+
+.card-side::after {
+  position: absolute;
+  content: "Sign up";
+  left: 70px;
+  top: 0;
+  width: 100px;
+  text-decoration: none;
+  color: var(--font-color);
+  font-weight: 600;
+}
+
+.toggle {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-colorcolor);
+  transition: 0.3s;
+}
+
+.slider:before {
+  box-sizing: border-box;
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  border: 2px solid var(--main-color);
+  border-radius: 5px;
+  left: -2px;
+  bottom: 2px;
+  background-color: var(--bg-color);
+  box-shadow: 0 3px 0 var(--main-color);
+  transition: 0.3s;
+}
+
+.toggle:checked + .slider {
+  background-color: var(--input-focus);
+}
+
+.toggle:checked + .slider:before {
+  transform: translateX(30px);
+}
+
+.toggle:checked ~ .card-side:before {
+  text-decoration: none;
+}
+
+.toggle:checked ~ .card-side:after {
+  text-decoration: underline;
+}
+
+.flip-card__inner {
+  width: 240px;
+  height: 290px;
+  position: relative;
+  background-color: transparent;
+  perspective: 1000px;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.toggle:checked ~ .flip-card__inner {
+  transform: rotateY(180deg);
+}
+
+.toggle:checked ~ .flip-card__front {
+  box-shadow: none;
+}
+
+.flip-card__front,
+.flip-card__back {
+  padding: 15px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background: lightgrey;
+  gap: 15px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.flip-card__front {
+  margin-top: 20px;
+}
+
+.flip-card__back {
+  transform: rotateY(180deg);
+}
+
+.flip-card__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.title {
+  margin: 10px 0;
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+  color: var(--main-color);
+}
+
+.flip-card__input {
+  width: 200px;
+  height: 35px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  background-color: var(--bg-color);
+  box-shadow: 4px 4px var(--main-color);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--font-color);
+  padding: 5px 10px;
+  outline: none;
+}
+
+.flip-card__input::placeholder {
+  color: var(--font-color-sub);
+  opacity: 0.8;
+}
+
+.flip-card__input:focus {
+  border: 2px solid var(--input-focus);
+}
+
+.flip-card__btn:active,
+.button-confirm:active {
+  box-shadow: 0px 0px var(--main-color);
+  transform: translate(3px, 3px);
+}
+
+.flip-card__btn {
+  margin: 10px 0;
+  width: 120px;
+  height: 35px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  background-color: var(--bg-color);
+  box-shadow: 4px 4px var(--main-color);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--font-color);
+  cursor: pointer;
+}
+
+.forgot-password {
+  font-size: 12px;
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+#social-page-logged-in {
+  width: 100%;
+  height: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.social-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header-sun-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#logout-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.friends-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: 8px;
+}
+.friends-list-container {
+  height: 240px;
+  border-radius: 8px;
+  padding: 4px;
+  overflow-y: auto;
+  background-color: #fafafa;
+  border: 1px dashed #a3a3a3;
+}
+
+.add-friend-form {
+  display: flex;
+  gap: 8px;
+}
+
+#add-friend-email {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 12px;
+  font-family: "Figtree", sans-serif;
+}
+
+#add-friend-btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Figtree", sans-serif;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+#add-friend-btn:hover {
+  background-color: #555;
+}
+
+.social-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.social-list li {
+  padding: 8px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.social-list li:last-child {
+  border-bottom: none;
+}
+
+.request-actions button {
+  font-size: 10px;
+  padding: 4px 8px;
+  margin-left: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.accept-btn {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.decline-btn {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* --- Friends List Styles --- */
+.social-list li.friend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+li.current-user-item {
+  background-color: #f0f4f8;
+}
+
+.friend-name {
+  margin-left: 20px;
+  font-weight: 500;
+  color: #333;
+}
+
+.friend-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.friend-score {
+  width: 120px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 12px;
+  color: #666;
+  background-color: #eee;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.remove-btn-container {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.remove-friend-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 8px;
+  padding: 0;
+  font-family: "Figtree", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 1px solid white;
+  background-color: #ffffff;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.remove-friend-btn:hover {
+  background-color: #fae1e3;
+}
+
+.social-list.show-remove .remove-friend-btn {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* --- Social Toolbar Styles --- */
+.social-toolbar {
+  display: flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  margin-top: 12px;
+  width: 100%;
+  height: auto;
+}
+
+.social-toolbar .action-button {
+  position: relative;
+  font-size: 20px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.social-toolbar .action-button:last-child {
+  border-right: none;
+}
+
+.gift-view {
+  display: none;
+}
+.gift-view.active {
+  display: block;
+}
+.empty-gift-message {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+.gift-text-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gift-subtitle {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  padding-left: 4px;
+}
+
+#mailbox-dropdown .claim-gift-btn.gift-reward-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 36px;
+  background-color: #fff8e1;
+  border: 1px solid #fcb33d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#mailbox-dropdown .claim-gift-btn.gift-reward-button:hover {
+  background-color: #ffecb3;
+}
+
+.request-text-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.request-text {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  padding-left: 4px;
+}
+
+.request-actions {
+  display: flex;
+}
+
+#mailbox-dropdown .action-btn {
+  background: none;
+  border: 0px solid #ccc;
+  border-radius: 20px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#mailbox-dropdown .action-btn.unproductive {
+  margin-right: 4px;
+}
+
+#mailbox-dropdown .action-btn.productive:hover {
+  background-color: #e8f5e9;
+  border-color: #a5d6a7;
+}
+
+#mailbox-dropdown .action-btn.unproductive:hover {
+  background-color: #ffebee;
+  border-color: #ef9a9a;
+}
+
+.plant-gift-text {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  padding-left: 4px;
+}
+
+#mailbox-dropdown .plant-claim-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 80px;
+  height: 36px;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+
+  padding: 6px 12px;
+  border-radius: 6px;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#mailbox-dropdown .plant-claim-button:hover {
+  background-color: #c8e6c9;
+}
+
+.dropdown-container {
+  margin: 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  width: 166px;
+  height: 136px;
+}
+
+.dropdown-container h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+#gift-dropdown {
+  transform: translateX(-25%);
+}
+
+.invite-description {
+  font-size: 11px;
+  text-align: center;
+  color: #666;
+  margin: -5px 0 10px 0;
+  padding: 0 5px;
+}
+
+.invite-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#invite-email-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 12px;
+  font-family: "Figtree", sans-serif;
+}
+
+#send-invite-btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Figtree", sans-serif;
+  font-weight: 500;
+}
+
+.invite-view {
+  display: none;
+}
+
+.invite-view.active {
+  display: block;
+}
+
+.share-header h4 {
+  margin: 0;
+  text-align: center;
+  padding-bottom: 4px;
+}
+
+#share-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  height: 100px;
+}
+
+.share-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.friends-share-icon {
+  width: 60px;
+  height: 60px;
+  fill: #888;
+}
+
+.share-rewards-text {
+  font-size: 12px;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+#action-mailbox {
+  position: relative;
+}
+
+#mailbox-container {
+  margin: 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  width: 216px;
+  height: 136px;
+}
+
+#mailbox-container h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+#mailbox-list-container {
+  max-height: 100px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.mailbox-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 5px;
+  padding: 4px;
+  border-radius: 5px;
+  border: 1px solid #d2d0d0;
+}
+.mailbox-item:hover {
+  background-color: #ffffff;
+}
+.empty-mailbox-message {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+#mailbox-dropdown {
+  width: 250px;
+}
+
+.gold-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+#sell-plant-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#sell-plant-btn .gold-icon {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+#gold-display {
+  display: flex;
+  align-items: center;
+}
+
+.potion-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.shop-item .potion-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+
+.seed-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.shop-item .seed-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+
+.fertilizer-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.shop-item .fertilizer-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+
+.social-toolbar-icon {
+  width: 28px;
+  height: 28px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.action-button:hover .social-toolbar-icon {
+  transform: scale(1.1);
+}
+
+#verify-email-banner {
+  background-color: #fff8e1;
+  color: #856404;
+  border: 1px solid #ffecb3;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 12px;
+}
+
+#verify-email-banner button {
+  margin-left: 10px;
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid #856404;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
